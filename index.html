@@ -3,286 +3,377 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Billing App — Web</title>
+<title>Billing App — Responsive Web</title>
 
-<!-- jsPDF for PDF export -->
+<!-- jsPDF (for PDF export) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-  :root{
-    --bg:#f7f9fc; --panel:#eaf0fb; --accent:#1976d2; --text:#1f2937;
-    --tree-even:#ffffff; --tree-odd:#f3f6fb; --low:#ffefef; --mono-font: "Lucida Console", Monaco, monospace;
-    --font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  }
-  body{font-family:var(--font-family); margin:0; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column;}
-  header{padding:12px 16px; background:var(--panel); display:flex; align-items:center; gap:12px;}
-  header h1{margin:0; font-size:18px;}
-  .toolbar{margin-left:auto; display:flex; gap:8px; align-items:center;}
-  main{flex:1; display:flex; padding:12px; gap:12px; box-sizing:border-box;}
-  .left, .right{background:var(--panel); padding:12px; border-radius:8px;}
-  .left{width:60%; display:flex; flex-direction:column; gap:10px;}
-  .right{width:40%; min-width:320px; display:flex; flex-direction:column; gap:10px;}
-  label{font-size:13px;}
-  input[type="text"], input[type="number"], select{padding:6px; border-radius:4px; border:1px solid #ccc; width:100%;}
-  .row{display:flex; gap:8px; align-items:center;}
-  .row > *{flex:none;}
-  .grow{flex:1;}
-  table{width:100%; border-collapse:collapse; font-size:13px;}
-  th, td{padding:8px; text-align:left; border-bottom:1px solid #e6e6e6;}
-  tr.low{background:var(--low);}
-  .totals{display:flex; justify-content:space-between; gap:12px; align-items:center;}
-  .btn{padding:6px 10px; border-radius:6px; background:var(--accent); color:white; border:none; cursor:pointer;}
-  .btn.secondary{background:#6b7280;}
-  .tabs{display:flex; gap:6px; margin-bottom:8px;}
-  .tab{padding:8px 10px; border-radius:6px; background:transparent; cursor:pointer;}
-  .tab.active{background:var(--accent); color:white;}
-  .small{font-size:12px; padding:4px 6px;}
-  .product-list{height:250px; overflow:auto; border:1px solid #ddd; background:white; padding:6px; border-radius:6px;}
-  .product-item{padding:6px; cursor:pointer;}
-  .search{display:flex; gap:6px; align-items:center;}
-  .preview{white-space:pre; font-family:var(--mono-font); background:whitesmoke; padding:8px; height:360px; overflow:auto; border-radius:6px;}
-  footer{padding:8px 12px; font-size:13px; background:transparent; display:flex; justify-content:space-between;}
-  /* Themes: Dark and Warm */
-  body.theme-dark{ --bg:#0f1724; --panel:#0b1220; --accent:#1e88e5; --text:#e6eef8; --tree-even:#0b1220; --tree-odd:#0f1626; --low:#3b0f0f; }
-  body.theme-warm{ --bg:#fcfbf8; --panel:#f6efe6; --accent:#ef6c00; --text:#3b2f2f; --tree-even:#fffaf5; --tree-odd:#fff3e0; --low:#ffddd2; }
-  input[type="file"]{display:none;}
-  .flex-col{display:flex; flex-direction:column; gap:6px;}
-  .hidden{display:none;}
-  .controls{display:flex; gap:6px; flex-wrap:wrap;}
-  .kbd{background:#eee; padding:2px 6px; border-radius:4px; font-size:12px;}
+/* ---------- Root & Themes ---------- */
+:root{
+  --bg:#f7f9fc; --panel:#eaf0fb; --accent:#1976d2; --accent-2:#1565c0;
+  --text:#1f2937; --muted:#6b7280; --danger:#c62828; --success:#2e7d32;
+  --card-radius:10px; --gap:10px; --mono: "Consolas", "Courier New", monospace;
+  --ui-font: "Segoe UI", Roboto, Arial, sans-serif;
+}
+body.theme-dark {
+  --bg:#0f1724; --panel:#0b1220; --accent:#1e88e5; --text:#e6eef8; --muted:#9aa8bf;
+}
+body.theme-warm {
+  --bg:#fcfbf8; --panel:#f6efe6; --accent:#ef6c00; --text:#3b2f2f; --muted:#6f5b4b;
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--ui-font); background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+.app{
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+/* ---------- Header ---------- */
+.header{
+  display:flex; gap:12px; align-items:center; padding:12px 14px; background:var(--panel);
+  border-bottom:1px solid rgba(0,0,0,0.04);
+  flex-wrap:wrap;
+}
+.header .brand{font-weight:700; font-size:18px}
+.header .meta{color:var(--muted); font-size:13px}
+.header .tools{margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.btn{background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:14px}
+.btn.secondary{background:#6b7280}
+.btn.ghost{background:transparent; color:var(--text); border:1px solid rgba(0,0,0,0.06)}
+.small{padding:6px 8px; font-size:13px; border-radius:6px}
+
+/* ---------- Layout ---------- */
+.container{display:flex; gap:12px; padding:12px; align-items:flex-start}
+.left{flex:1; display:flex; flex-direction:column; gap:12px}
+.right{width:360px; min-width:260px; display:flex; flex-direction:column; gap:12px}
+
+/* Card */
+.card{background:var(--panel); border-radius:var(--card-radius); padding:12px; box-shadow:0 1px 0 rgba(0,0,0,0.02)}
+
+/* Tabs */
+.tabs{display:flex; gap:8px}
+.tab{padding:8px 10px; border-radius:8px; background:transparent; cursor:pointer}
+.tab.active{background:var(--accent); color:white}
+
+/* Forms */
+.row{display:flex; gap:8px; align-items:center}
+.col{flex:1}
+.input, input[type="text"], input[type="number"], select, textarea{
+  width:100%; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08);
+  font-size:14px; background:white; color:var(--text)
+}
+.small-input{padding:8px}
+
+/* Suggestion list */
+.suggestions{background:white; border:1px solid rgba(0,0,0,0.06); border-radius:8px; max-height:220px; overflow:auto; margin-top:6px}
+
+/* Table */
+.table-wrapper{overflow:auto; background:white; border-radius:8px}
+table{width:100%; border-collapse:collapse; font-size:14px}
+th,td{padding:10px; text-align:left; border-bottom:1px solid #eee}
+tr.low{background:#fff2f2}
+.actions-cell{white-space:nowrap}
+
+/* Totals */
+.totals{display:flex; justify-content:space-between; align-items:center; gap:12px; padding-top:8px}
+
+/* Print preview */
+.preview{white-space:pre; font-family:var(--mono); background:white; padding:12px; border-radius:8px; height:360px; overflow:auto}
+
+/* Product master */
+.prod-list{max-height:320px; overflow:auto; background:white; border-radius:8px; padding:6px}
+
+/* Image preview */
+.img-preview img{max-width:100%; max-height:160px; border-radius:8px}
+
+/* Footer */
+.footer{padding:10px; text-align:center; color:var(--muted); font-size:13px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .container{flex-direction:column}
+  .right{width:100%}
+}
+@media (max-width:700px){
+  .header{padding:10px}
+  .btn{padding:10px 12px}
+  .tabs{position:fixed; bottom:0; left:0; right:0; z-index:100; justify-content:space-around; background:var(--panel); padding:6px; border-top:1px solid rgba(0,0,0,0.06)}
+  .container{padding-bottom:76px}
+  .right{order:2}
+  .left{order:1}
+  .card{padding:10px}
+  .preview{height:260px}
+}
+/* tiny screens */
+@media (max-width:420px){
+  .header .brand{font-size:16px}
+  .right{min-width:0}
+  th,td{padding:8px; font-size:13px}
+  .input{padding:8px}
+}
+
+/* small helper */
+.kbd{background:#eee; padding:3px 6px; border-radius:4px; font-size:12px}
+.hidden{display:none}
 </style>
 </head>
-<body>
+<body class="">
+<div class="app">
 
-<header>
-  <h1 id="shopName">P.MUTHUGANESAN NADAR TEXTILE AND READYMADE</h1>
-  <div style="font-size:13px; color:gray;">103b kamachi amman sanathi street east raja veethi kanchipuram • 04447791355</div>
-  <div class="toolbar">
-    <button class="btn small" id="cycleTheme">Cycle Theme</button>
-    <button class="btn small secondary" id="backupBtn">Export JSON</button>
-    <button class="btn small" id="importBtn">Import JSON</button>
-    <button class="btn small" id="helpBtn">Shortcuts</button>
-  </div>
-</header>
-
-<main>
-  <div class="left">
-    <div class="tabs" id="tabs">
-      <div class="tab active" data-tab="billing">🧾 Billing</div>
-      <div class="tab" data-tab="print">🖨️ Print</div>
-      <div class="tab" data-tab="products">📦 Products</div>
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="brand" id="shopName">P.MUTHUGANESAN NADAR TEXTILE AND READYMADE</div>
+      <div class="meta" id="shopMeta">103b kamachi amman sanathi street east raja veethi kanchipuram • 04447791355</div>
     </div>
 
-    <!-- Billing -->
-    <section id="billing" class="pane">
-      <div style="display:flex; gap:10px;">
-        <div style="flex:1;">
-          <label>Customer Name</label>
-          <input type="text" id="custName" value="Customer" />
-        </div>
-        <div style="width:220px;">
-          <label>Phone</label>
-          <input type="text" id="custPhone" />
-        </div>
+    <div class="tools">
+      <button class="btn small" id="cycleThemeBtn">Cycle Theme</button>
+      <button class="btn small secondary" id="backupBtn">Export JSON</button>
+      <button class="btn small" id="restoreBtn">Import JSON</button>
+      <button class="btn small ghost" id="helpBtn">Shortcuts</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="container">
+    <div class="left">
+
+      <!-- Tabs -->
+      <div class="tabs card" id="mainTabs">
+        <div class="tab active" data-tab="billingTab">🧾 Billing</div>
+        <div class="tab" data-tab="printTab">🖨 Print</div>
+        <div class="tab" data-tab="productsTab">📦 Products</div>
       </div>
 
-      <div style="margin-top:10px; border-radius:6px; padding:10px; background:white;">
-        <div class="row">
-          <div style="flex:1;">
+      <!-- Billing Card -->
+      <div class="card" id="billingTab">
+        <div style="display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap">
+          <div style="flex:1; min-width:200px">
+            <label>Customer Name</label>
+            <input id="custName" class="input" type="text" value="Customer" />
+          </div>
+          <div style="width:220px">
+            <label>Phone</label>
+            <input id="custPhone" class="input" type="text" />
+          </div>
+        </div>
+
+        <hr style="margin:10px 0"/>
+
+        <!-- Add item -->
+        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap">
+          <div style="flex:1; min-width:180px">
             <label>Item</label>
-            <input type="text" id="itemName" placeholder="Start typing to see suggestions" />
-            <div id="suggestions" class="product-list hidden"></div>
+            <input id="itemName" class="input" type="text" placeholder="Type to search products or add new" />
+            <div class="suggestions hidden" id="suggestBox"></div>
           </div>
-          <div style="width:110px;">
-            <label>MRP</label><input type="number" id="itemMrp" step="0.01" />
+          <div style="width:110px">
+            <label>MRP</label>
+            <input id="itemMrp" class="input small-input" type="number" step="0.01" />
           </div>
-          <div style="width:110px;">
-            <label>Rate</label><input type="number" id="itemRate" step="0.01" />
+          <div style="width:110px">
+            <label>Rate</label>
+            <input id="itemRate" class="input small-input" type="number" step="0.01" />
           </div>
-          <div style="width:90px;">
-            <label>Disc %</label><input type="number" id="itemDisc" step="0.01" />
+          <div style="width:90px">
+            <label>Disc %</label>
+            <input id="itemDisc" class="input small-input" type="number" step="0.01" />
           </div>
-          <div style="width:80px;">
-            <label>Qty</label><input type="number" id="itemQty" value="1" />
+          <div style="width:90px">
+            <label>Qty</label>
+            <input id="itemQty" class="input small-input" type="number" value="1" />
           </div>
-          <div style="width:120px; display:flex; align-items:end;">
+          <div style="width:120px">
             <button class="btn" id="addItemBtn">Add Item</button>
           </div>
         </div>
-      </div>
 
-      <div style="margin-top:10px; background:white; border-radius:6px; padding:8px;">
-        <table id="itemsTable">
-          <thead><tr><th>Item</th><th>MRP</th><th>Rate</th><th>Disc%</th><th>Qty</th><th>Total</th><th></th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div style="display:flex; gap:12px; margin-top:8px; align-items:center;">
-        <div style="flex:1">
-          <label>Low stock threshold</label>
-          <input type="number" id="lowThreshold" value="100" />
-          <button class="btn small secondary" id="removeLow">Remove Low Stock Items</button>
+        <div style="margin-top:12px" class="table-wrapper card">
+          <table id="itemsTable">
+            <thead>
+              <tr><th>Item</th><th>MRP</th><th>Rate</th><th>Disc%</th><th>Qty</th><th>Total</th><th class="actions-cell">Actions</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-        <div style="width:260px;">
-          <label>GST %</label>
-          <input type="number" id="gst" value="18" step="0.1" />
-        </div>
-      </div>
 
-      <div style="margin-top:10px;" class="totals">
-        <div>
-          <div>Items: <span id="itemCount">0</span></div>
-          <div class="controls" style="margin-top:6px;">
-            <button class="btn secondary small" id="undoBtn">Undo</button>
-            <button class="btn secondary small" id="redoBtn">Redo</button>
-            <button class="btn secondary small" id="clearBtn">Clear All</button>
+        <div style="display:flex; gap:12px; align-items:center; margin-top:8px; flex-wrap:wrap">
+          <div>
+            <label>Low stock threshold</label>
+            <input id="lowThreshold" class="input small-input" type="number" value="100" />
+          </div>
+          <div>
+            <label>GST %</label>
+            <input id="gstPercent" class="input small-input" type="number" value="18" step="0.1" />
+          </div>
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+            <button class="btn small secondary" id="undoBtn">Undo</button>
+            <button class="btn small secondary" id="redoBtn">Redo</button>
+            <button class="btn small" id="clearBtn">Clear All</button>
           </div>
         </div>
-        <div style="text-align:right;">
-          <div>SubTotal: ₹ <span id="subtotal">0.00</span></div>
-          <div>GST: ₹ <span id="gstAmount">0.00</span></div>
-          <div style="font-weight:700; font-size:18px;">Total: ₹ <span id="total">0.00</span></div>
-          <div style="margin-top:6px;">Paid: <input type="number" id="paid" value="0" style="width:100px;"/> Due: ₹ <span id="due">0.00</span></div>
-          <div style="margin-top:8px;">
-            <button class="btn" id="openPrintTab">Preview & Print</button>
-            <button class="btn" id="savePdfBtn">Save PDF</button>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Print -->
-    <section id="print" class="pane hidden">
-      <div class="row" style="justify-content:space-between;">
-        <div><label>Printer: (use browser Print)</label></div>
-        <div>
-          <button class="btn" id="printBtn">Browser Print</button>
-          <button class="btn" id="savePdfBtn2">Save PDF</button>
-          <button class="btn secondary" id="backToBilling">Back</button>
-        </div>
-      </div>
-      <div style="margin-top:8px;" class="preview" id="printPreview"></div>
-    </section>
-
-    <!-- Products -->
-    <section id="products" class="pane hidden">
-      <div style="display:flex; gap:10px;">
-        <div style="width:40%;">
-          <label>Search</label>
-          <input type="text" id="prodSearch" placeholder="Search product name, category or brand" />
-          <div style="margin-top:8px;">
-            <button class="btn small" id="importCsvBtn">Import CSV</button>
-            <button class="btn small" id="exportCsvBtn">Export CSV</button>
-            <button class="btn small secondary" id="addProdBtn">Add Product</button>
+        <div class="totals" style="margin-top:10px">
+          <div>
+            <div>Items: <span id="itemsCount">0</span></div>
+            <div style="margin-top:6px" class="meta">Paid: <input id="paidAmount" class="input small-input" type="number" value="0" style="width:120px; display:inline-block" /></div>
           </div>
-          <div style="margin-top:8px; height:320px; overflow:auto; border:1px solid #ddd; border-radius:6px; background:white;" id="prodTree"></div>
-        </div>
-        <div style="flex:1;">
-          <label>Product Details</label>
-          <div class="flex-col">
-            <div class="row"><input placeholder="SKU" id="p_sku"/><input placeholder="Name" id="p_name" class="grow"/></div>
-            <div class="row"><input placeholder="Category" id="p_category"/><input placeholder="Brand" id="p_brand" class="grow"/></div>
-            <div class="row"><input placeholder="MRP" id="p_mrp" type="number" step="0.01"/><input placeholder="Rate" id="p_rate" type="number" step="0.01"/></div>
-            <div class="row"><input placeholder="Discount%" id="p_discount" type="number" step="0.01"/><input placeholder="Qty" id="p_qty" type="number"/></div>
-            <div class="row"><label class="small">Attach Image</label><input type="file" id="p_imagefile"/></div>
-            <div id="p_image_preview"></div>
-            <div style="display:flex; gap:6px;">
-              <button class="btn" id="saveProdBtn">Save Product</button>
-              <button class="btn secondary" id="deleteProdBtn">Delete</button>
+          <div style="text-align:right">
+            <div>SubTotal: ₹ <span id="subTotal">0.00</span></div>
+            <div>GST: ₹ <span id="gstAmount">0.00</span></div>
+            <div style="font-weight:700; font-size:18px">Total: ₹ <span id="totalAmount">0.00</span></div>
+            <div style="margin-top:6px">Due: ₹ <span id="dueAmount">0.00</span></div>
+            <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end">
+              <button class="btn" id="openPrintBtn">Preview</button>
+              <button class="btn" id="savePdfBtn">Save PDF</button>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
+      <!-- Print Card -->
+      <div class="card hidden" id="printTab">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <div><b>Print Preview</b></div>
+          <div style="display:flex; gap:8px">
+            <button class="btn" id="printBtn">Browser Print</button>
+            <button class="btn secondary" id="backToBillingBtn">Back</button>
+          </div>
+        </div>
+        <div style="margin-top:10px" class="preview" id="printPreview"></div>
+      </div>
+
+      <!-- Products Card -->
+      <div class="card hidden" id="productsTab">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+          <input id="prodSearch" class="input" type="text" placeholder="Search products by name, category, brand" />
+          <button class="btn small" id="importCsvBtn">Import CSV</button>
+          <button class="btn small" id="exportCsvBtn">Export CSV</button>
+        </div>
+
+        <div style="display:flex; gap:12px; margin-top:10px; align-items:flex-start; flex-wrap:wrap">
+          <div style="flex:1; min-width:220px">
+            <div class="prod-list" id="prodList"></div>
+          </div>
+          <div style="width:360px; min-width:260px">
+            <div style="display:flex; flex-direction:column; gap:8px">
+              <input id="p_sku" class="input" placeholder="SKU" />
+              <input id="p_name" class="input" placeholder="Name" />
+              <input id="p_category" class="input" placeholder="Category" />
+              <input id="p_brand" class="input" placeholder="Brand" />
+              <div style="display:flex; gap:8px">
+                <input id="p_mrp" class="input" placeholder="MRP" type="number" />
+                <input id="p_rate" class="input" placeholder="Rate" type="number" />
+              </div>
+              <div style="display:flex; gap:8px">
+                <input id="p_discount" class="input" placeholder="Discount%" type="number" />
+                <input id="p_qty" class="input" placeholder="Qty" type="number" />
+              </div>
+
+              <div>
+                <label class="meta">Attach Image</label>
+                <input id="p_image" type="file" accept="image/*" />
+                <div class="img-preview" id="p_image_preview"></div>
+              </div>
+
+              <div style="display:flex; gap:8px">
+                <button class="btn" id="saveProdBtn">Save Product</button>
+                <button class="btn secondary" id="deleteProdBtn">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="right">
+      <div class="card">
+        <h4 style="margin:0 0 8px 0">Quick Tools</h4>
+        <div style="display:flex; gap:8px; flex-direction:column">
+          <button class="btn" id="reloadProductsBtn">Reload Products</button>
+          <button class="btn secondary" id="exportProductsJsonBtn">Export Products JSON</button>
+          <button class="btn" id="importProductsJsonBtn">Import Products JSON</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="margin:0 0 8px 0">Shortcuts</h4>
+        <div style="font-size:13px; color:var(--muted)">
+          <div><span class="kbd">Enter</span> Add item (in Qty or last field)</div>
+          <div><span class="kbd">Ctrl+S</span> Save PDF</div>
+          <div><span class="kbd">Ctrl+N</span> New invoice</div>
+          <div><span class="kbd">Alt+T</span> Cycle theme</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="margin:0 0 8px 0">Backup</h4>
+        <div style="display:flex; gap:8px">
+          <button class="btn" id="downloadAppJsonBtn">Download App JSON</button>
+          <button class="btn secondary" id="uploadAppJsonBtn">Upload JSON</button>
+        </div>
+        <input type="file" id="appJsonInput" accept="application/json" class="hidden" />
+      </div>
+    </div>
   </div>
 
-  <div class="right">
-    <div style="background:white; padding:10px; border-radius:6px;">
-      <h3 style="margin:0 0 8px 0;">Quick Controls</h3>
-      <div style="display:flex; gap:6px; flex-direction:column;">
-        <button class="btn" id="reloadProducts">Reload Products</button>
-        <button class="btn secondary" id="saveProductsJson">Export Products JSON</button>
-        <button class="btn" id="loadProductsJson">Import Products JSON</button>
-      </div>
-    </div>
-
-    <div style="background:white; padding:10px; border-radius:6px;">
-      <h4 style="margin:0 0 8px 0;">Help & Shortcuts</h4>
-      <div style="font-size:13px; color:#444;">
-        <div><span class="kbd">Enter</span> add item (when in item fields)</div>
-        <div><span class="kbd">Ctrl+S</span> save PDF</div>
-        <div><span class="kbd">Ctrl+N</span> clear invoice</div>
-        <div><span class="kbd">Alt+T</span> cycle theme</div>
-        <div style="margin-top:6px;">Data is stored in browser <b>localStorage</b>. Export JSON/CSV to backup.</div>
-      </div>
-    </div>
-
-    <div style="background:white; padding:10px; border-radius:6px;">
-      <h4 style="margin:0 0 8px 0;">Backup / Restore</h4>
-      <div style="display:flex; gap:6px;">
-        <button class="btn" id="downloadJsonBtn">Download App JSON</button>
-        <button class="btn secondary" id="uploadJsonBtn">Upload JSON</button>
-      </div>
-      <input type="file" id="uploadJsonInput" accept="application/json" style="display:none" />
-    </div>
-  </div>
-</main>
-
-<footer>
-  <div>Billing App — Browser Edition</div>
-  <div>© <span id="year"></span></div>
-</footer>
+  <div class="footer card">Billing App — Browser Edition • Data stored in browser localStorage • Works on mobile & desktop</div>
+</div>
 
 <script>
+/* =========================
+   Billing App — Browser JS
+   - Single-file conversion of your Tkinter app
+   - Uses localStorage to persist:
+       - products (key: billing_products_v1)
+       - bills (key: billing_bills_v1)
+       - bill counter (key: billing_bill_counter)
+       - settings (key: billing_settings_v1)
+   ========================= */
+
 (function(){
-  // Simple single-file app state
-  const APPKEY = "billing_app_web_v1";
+  // Storage keys
   const PRODUCTS_KEY = "billing_products_v1";
+  const BILLS_KEY = "billing_bills_v1";
+  const COUNTER_KEY = "billing_bill_counter_v1";
+  const SETTINGS_KEY = "billing_settings_v1";
+  const APP_KEY = "billing_app_state_v1";
 
-  const defaultShop = {
-    name: "P.MUTHUGANESAN NADAR TEXTILE AND READYMADE",
-    address: "103b kamachi amman sanathi street east raja veethi kanchipuram",
-    phone: "04447791355 / 9944369227"
-  };
-
-  // DOM references
+  // DOM shortcuts
   const tabs = document.querySelectorAll('.tab');
-  const panes = document.querySelectorAll('.pane');
-  const gstEl = document.getElementById('gst');
-  const subtotalEl = document.getElementById('subtotal');
-  const gstAmtEl = document.getElementById('gstAmount');
-  const totalEl = document.getElementById('total');
-  const itemsTableBody = document.querySelector('#itemsTable tbody');
-  const itemCountEl = document.getElementById('itemCount');
-  const paidEl = document.getElementById('paid');
-  const dueEl = document.getElementById('due');
+  const billingTabEl = document.getElementById('billingTab');
+  const printTabEl = document.getElementById('printTab');
+  const productsTabEl = document.getElementById('productsTab');
+  const itemsTbody = document.querySelector('#itemsTable tbody');
   const addItemBtn = document.getElementById('addItemBtn');
-  const itemName = document.getElementById('itemName');
-  const itemMrp = document.getElementById('itemMrp');
-  const itemRate = document.getElementById('itemRate');
-  const itemDisc = document.getElementById('itemDisc');
-  const itemQty = document.getElementById('itemQty');
-  const suggestions = document.getElementById('suggestions');
-  const prodTree = document.getElementById('prodTree');
-  const prodSearch = document.getElementById('prodSearch');
-  const lowThreshold = document.getElementById('lowThreshold');
-  const removeLowBtn = document.getElementById('removeLow');
-  const savePdfBtn = document.getElementById('savePdfBtn');
-  const savePdfBtn2 = document.getElementById('savePdfBtn2');
-  const printBtn = document.getElementById('printBtn');
-  const printPreview = document.getElementById('printPreview');
-  const openPrintTabBtn = document.getElementById('openPrintTab');
-  const clearBtn = document.getElementById('clearBtn');
-  const undoBtn = document.getElementById('undoBtn');
-  const redoBtn = document.getElementById('redoBtn');
-  const cycleThemeBtn = document.getElementById('cycleTheme');
-  const helpBtn = document.getElementById('helpBtn');
-  const backupBtn = document.getElementById('backupBtn');
-  const importBtn = document.getElementById('importBtn');
+  const itemNameEl = document.getElementById('itemName');
+  const itemMrpEl = document.getElementById('itemMrp');
+  const itemRateEl = document.getElementById('itemRate');
+  const itemDiscEl = document.getElementById('itemDisc');
+  const itemQtyEl = document.getElementById('itemQty');
+  const suggestBox = document.getElementById('suggestBox');
+  const gstPercentEl = document.getElementById('gstPercent');
+  const subTotalEl = document.getElementById('subTotal');
+  const gstAmountEl = document.getElementById('gstAmount');
+  const totalAmountEl = document.getElementById('totalAmount');
+  const paidAmountEl = document.getElementById('paidAmount');
+  const dueAmountEl = document.getElementById('dueAmount');
+  const itemsCountEl = document.getElementById('itemsCount');
+  const lowThresholdEl = document.getElementById('lowThreshold');
 
-  // product fields
+  const printPreviewEl = document.getElementById('printPreview');
+
+  const prodListEl = document.getElementById('prodList');
+  const prodSearchEl = document.getElementById('prodSearch');
   const p_sku = document.getElementById('p_sku');
   const p_name = document.getElementById('p_name');
   const p_category = document.getElementById('p_category');
@@ -291,282 +382,363 @@
   const p_rate = document.getElementById('p_rate');
   const p_discount = document.getElementById('p_discount');
   const p_qty = document.getElementById('p_qty');
-  const p_imagefile = document.getElementById('p_imagefile');
+  const p_image = document.getElementById('p_image');
   const p_image_preview = document.getElementById('p_image_preview');
+
+  // buttons
+  const savePdfBtn = document.getElementById('savePdfBtn');
+  const printBtn = document.getElementById('printBtn');
+  const openPrintBtn = document.getElementById('openPrintBtn');
+  const backToBillingBtn = document.getElementById('backToBillingBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+  const clearBtn = document.getElementById('clearBtn');
+
   const saveProdBtn = document.getElementById('saveProdBtn');
   const deleteProdBtn = document.getElementById('deleteProdBtn');
-  const addProdBtn = document.getElementById('addProdBtn');
   const importCsvBtn = document.getElementById('importCsvBtn');
   const exportCsvBtn = document.getElementById('exportCsvBtn');
 
-  // right controls
-  const downloadJsonBtn = document.getElementById('downloadJsonBtn');
-  const uploadJsonBtn = document.getElementById('uploadJsonBtn');
-  const uploadJsonInput = document.getElementById('uploadJsonInput');
+  // quick tools
+  const reloadProductsBtn = document.getElementById('reloadProductsBtn');
+  const exportProductsJsonBtn = document.getElementById('exportProductsJsonBtn');
+  const importProductsJsonBtn = document.getElementById('importProductsJsonBtn');
 
-  document.getElementById('year').textContent = new Date().getFullYear();
+  const downloadAppJsonBtn = document.getElementById('downloadAppJsonBtn');
+  const uploadAppJsonBtn = document.getElementById('uploadAppJsonBtn');
+  const appJsonInput = document.getElementById('appJsonInput');
 
-  // app state
-  let products = loadProducts(); // object keyed by lower-name
+  const cycleThemeBtn = document.getElementById('cycleThemeBtn');
+  const backupBtn = document.getElementById('backupBtn');
+  const restoreBtn = document.getElementById('restoreBtn');
+  const helpBtn = document.getElementById('helpBtn');
+
+  // state
+  let products = {}; // keyed by lower(name)
   let items = []; // items in current bill
-  let undoStack = []; let undoIndex = -1;
+  let undoStack = [], undoIndex = -1;
+  let settings = { lastTheme: "Light", gst: 18.0, lowThreshold: 100 };
 
-  // theme cycle
-  const themeOrder = ['','theme-dark','theme-warm'];
-  let themeIndex = 0;
-  function applyThemeByIndex(i){
-    document.body.classList.remove(...themeOrder);
-    document.body.classList.add(themeOrder[i] || '');
-    themeIndex = i;
+  // init
+  function init(){
+    loadSettingsFromStorage();
+    loadProductsFromStorage();
+    attachEvents();
+    renderProducts();
+    renderItems();
+    applyTheme(settings.lastTheme);
+    pushSnapshot();
   }
-  cycleThemeBtn.addEventListener('click', ()=> applyThemeByIndex((themeIndex+1)%themeOrder.length));
-  document.addEventListener('keydown', (e)=> {
-    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); savePDF(); }
-    if(e.altKey && e.key.toLowerCase() === 't'){ applyThemeByIndex((themeIndex+1)%themeOrder.length); }
-    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'n'){ clearAll(); }
-  });
 
-  // tabs
-  tabs.forEach(t=>{
-    t.addEventListener('click', ()=> {
+  // ---------- storage helpers ----------
+  function saveProductsToStorage(){ localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); }
+  function loadProductsFromStorage(){
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    if(raw){ try{ products = JSON.parse(raw); }catch(e){ products = {}; } }
+  }
+  function saveBillsToStorage(bills){
+    localStorage.setItem(BILLS_KEY, JSON.stringify(bills || []));
+  }
+  function loadSettingsFromStorage(){
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if(raw){ try{ settings = JSON.parse(raw); }catch(e){ settings = { lastTheme: "Light", gst:18, lowThreshold:100 } } }
+    // apply to UI
+    gstPercentEl.value = settings.gst || 18;
+    lowThresholdEl.value = settings.lowThreshold || 100;
+  }
+  function saveSettingsToStorage(){
+    settings.gst = parseFloat(gstPercentEl.value||0);
+    settings.lowThreshold = parseInt(lowThresholdEl.value||0);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }
+  function getNextBillNo(){
+    let n = parseInt(localStorage.getItem(COUNTER_KEY) || "0", 10);
+    n = n + 1;
+    localStorage.setItem(COUNTER_KEY, String(n));
+    return `BILL-${String(n).padStart(6,'0')}`;
+  }
+
+  // ---------- UI events ----------
+  function attachEvents(){
+    // Tabs
+    tabs.forEach(t=> t.addEventListener('click', ()=> {
       tabs.forEach(x=>x.classList.remove('active'));
       t.classList.add('active');
-      const tab = t.getAttribute('data-tab');
-      panes.forEach(p=>p.classList.add('hidden'));
-      document.getElementById(tab).classList.remove('hidden');
-      if(tab==='print') refreshPrintPreview();
+      const target = t.dataset.tab;
+      document.getElementById('billingTab').classList.toggle('hidden', target!=='billingTab');
+      document.getElementById('printTab').classList.toggle('hidden', target!=='printTab');
+      document.getElementById('productsTab').classList.toggle('hidden', target!=='productsTab');
+      if(target==='printTab') refreshPrintPreview();
+    }));
+
+    // Add item
+    addItemBtn.addEventListener('click', addItemFromInputs);
+    itemQtyEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ addItemFromInputs(); }});
+    itemNameEl.addEventListener('input', showSuggestions);
+    itemNameEl.addEventListener('keydown', (e)=>{ if(e.key==='ArrowDown'){ focusSuggestBox(); }});
+
+    // suggestion click handled in showSuggestions
+
+    // Totals recalc
+    gstPercentEl.addEventListener('input', ()=> { updateTotals(); saveSettingsToStorage(); pushSnapshot(); });
+    paidAmountEl.addEventListener('input', updateTotals);
+
+    // Print & PDF
+    openPrintBtn.addEventListener('click', ()=> { document.querySelector('.tab[data-tab="print"]').click();});
+    backToBillingBtn.addEventListener('click', ()=> { document.querySelector('.tab[data-tab="billing"]').click();});
+    printBtn.addEventListener('click', ()=> window.print());
+    savePdfBtn.addEventListener('click', savePdf);
+
+    // Undo/Redo, Clear
+    undoBtn.addEventListener('click', doUndo);
+    redoBtn.addEventListener('click', doRedo);
+    clearBtn.addEventListener('click', clearAll);
+
+    // Products
+    prodSearchEl.addEventListener('input', ()=> renderProducts(prodSearchEl.value));
+    saveProdBtn.addEventListener('click', saveProductFromForm);
+    deleteProdBtn.addEventListener('click', deleteProductFromForm);
+    importCsvBtn.addEventListener('click', importProductsCsv);
+    exportCsvBtn.addEventListener('click', exportProductsCsv);
+
+    // Quick tools
+    reloadProductsBtn.addEventListener('click', ()=> { loadProductsFromStorage(); renderProducts(); alert('Products reloaded');});
+    exportProductsJsonBtn.addEventListener('click', ()=> downloadText(JSON.stringify(products,null,2),'products.json','application/json'));
+    importProductsJsonBtn.addEventListener('click', ()=> importProductsJson());
+
+    // App backup
+    downloadAppJsonBtn.addEventListener('click', ()=> {
+      const payload = { products, items };
+      downloadText(JSON.stringify(payload,null,2), 'billing_app_export.json','application/json');
     });
-  });
+    uploadAppJsonBtn.addEventListener('click', ()=> appJsonInput.click());
+    appJsonInput.addEventListener('change', (e)=> {
+      const f = e.target.files[0]; if(!f) return;
+      const fr = new FileReader(); fr.onload = ()=> {
+        try{
+          const data = JSON.parse(fr.result);
+          if(data.products){ products = data.products; saveProductsToStorage(); renderProducts();}
+          if(data.items){ items = data.items; renderItems();}
+          pushSnapshot();
+          alert('Imported app JSON');
+        }catch(err){ alert('Invalid JSON'); }
+      }; fr.readAsText(f,'utf8');
+    });
 
-  // Load/save app from localStorage
-  function saveApp(){
-    const data = { products, items, settings:{ gst: parseFloat(gstEl.value||0), lowThreshold: parseInt(lowThreshold.value||100) } };
-    localStorage.setItem(APPKEY, JSON.stringify(data));
-  }
-  function loadApp(){
-    const raw = localStorage.getItem(APPKEY);
-    if(!raw) return null;
-    try { return JSON.parse(raw); } catch(e){ return null; }
+    // Other UI
+    cycleThemeBtn.addEventListener('click', cycleTheme);
+    helpBtn.addEventListener('click', ()=> showShortcuts());
+    backupBtn.addEventListener('click', ()=> downloadText(JSON.stringify({products, settings}, null,2), 'billing_backup.json','application/json'));
+    restoreBtn.addEventListener('click', ()=> document.getElementById('appJsonInput').click());
+
+    // keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); savePdf(); }
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='n'){ e.preventDefault(); clearAll(); }
+      if(e.altKey && e.key.toLowerCase()==='t'){ cycleTheme(); }
+    });
+
+    // product image preview
+    p_image.addEventListener('change', ()=>{
+      const f = p_image.files[0]; if(!f) return;
+      const fr = new FileReader();
+      fr.onload = ()=> { p_image_preview.innerHTML = `<img src="${fr.result}" alt="img" style="max-width:100%; max-height:160px; border-radius:8px"/>`; }
+      fr.readAsDataURL(f);
+    });
   }
 
-  function loadProducts(){
-    const raw = localStorage.getItem(PRODUCTS_KEY);
-    if(!raw) return {};
-    try{ return JSON.parse(raw); }catch(e){ return {}; }
+  // ---------- Suggestions ----------
+  function showSuggestions(){
+    const q = itemNameEl.value.trim().toLowerCase();
+    suggestBox.innerHTML = '';
+    if(!q){ suggestBox.classList.add('hidden'); return; }
+    const arr = Object.values(products).filter(p=> (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) );
+    if(arr.length===0){ suggestBox.classList.add('hidden'); return; }
+    arr.slice(0,20).forEach(p=>{
+      const d = document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid #f0f0f0';
+      d.style.cursor='pointer';
+      d.innerHTML = `<strong>${escapeHtml(p.name)}</strong><div style="font-size:13px;color:${getCssVar('--muted')}">Rate: ₹${num(p.rate)} • Qty: ${p.qty||0}</div>`;
+      d.addEventListener('click', ()=> {
+        itemNameEl.value = p.name || '';
+        itemMrpEl.value = p.mrp || '';
+        itemRateEl.value = p.rate || '';
+        itemDiscEl.value = p.discount || '';
+        itemQtyEl.value = 1;
+        suggestBox.classList.add('hidden');
+      });
+      suggestBox.appendChild(d);
+    });
+    suggestBox.classList.remove('hidden');
   }
-  function saveProducts(){
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-  }
+  function focusSuggestBox(){ const first = suggestBox.querySelector('div'); if(first) first.focus(); }
 
-  // Undo/Redo
-  function pushSnapshot(){
-    undoStack = undoStack.slice(0, undoIndex+1);
-    undoStack.push(JSON.stringify({items, products}));
-    if(undoStack.length>200) undoStack.shift();
-    undoIndex = undoStack.length - 1;
-    updateUndoButtons();
-  }
-  function updateUndoButtons(){
-    undoBtn.disabled = undoIndex <= 0;
-    redoBtn.disabled = undoIndex >= undoStack.length - 1;
-  }
-  function doUndo(){
-    if(undoIndex <= 0) return;
-    undoIndex -= 1;
-    const state = JSON.parse(undoStack[undoIndex]);
-    items = state.items || [];
-    products = state.products || {};
-    renderItems();
-    renderProductsTree();
-    saveProducts(); saveApp();
-    updateUndoButtons();
-  }
-  function doRedo(){
-    if(undoIndex >= undoStack.length - 1) return;
-    undoIndex += 1;
-    const state = JSON.parse(undoStack[undoIndex]);
-    items = state.items || [];
-    products = state.products || {};
-    renderItems();
-    renderProductsTree();
-    saveProducts(); saveApp();
-    updateUndoButtons();
-  }
-  undoBtn.addEventListener('click', doUndo);
-  redoBtn.addEventListener('click', doRedo);
-
-  // Add item
-  addItemBtn.addEventListener('click', addItem);
-  itemQty.addEventListener('keydown', (e)=>{ if(e.key==='Enter') addItem(); });
-  itemName.addEventListener('input', showSuggestions);
-
-  function addItem(){
-    const name = itemName.value.trim();
-    const mrp = parseFloat(itemMrp.value || 0) || 0;
-    const rate = parseFloat(itemRate.value || 0) || 0;
-    const discount = parseFloat(itemDisc.value || 0) || 0;
-    const qty = parseInt(itemQty.value || 0) || 0;
-    if(!name){ alert("Item name required"); return; }
-    const total = +(rate * qty * (1 - discount/100)).toFixed(2);
-    items.push({name, mrp, rate, discount, qty, total});
+  // ---------- ITEMS (billing) ----------
+  function addItemFromInputs(){
+    const name = itemNameEl.value.trim();
+    const mrp = parseFloat(itemMrpEl.value||0) || 0;
+    const rate = parseFloat(itemRateEl.value||0) || 0;
+    const disc = parseFloat(itemDiscEl.value||0) || 0;
+    const qty = parseInt(itemQtyEl.value||0) || 0;
+    if(!name){ alert('Item name required'); return; }
+    const total = +(rate * qty * (1 - (disc/100))).toFixed(2);
+    items.push({ name, mrp, rate, discount: disc, qty, total });
     pushSnapshot();
     renderItems();
-    saveApp();
-    // clear fields
-    itemName.value=''; itemMrp.value=''; itemRate.value=''; itemDisc.value=''; itemQty.value='1';
-    suggestions.classList.add('hidden');
+    // reset inputs
+    itemNameEl.value=''; itemMrpEl.value=''; itemRateEl.value=''; itemDiscEl.value=''; itemQtyEl.value='1';
+    saveSettingsToStorage();
   }
 
-  // suggestions
-  function showSuggestions(){
-    const q = itemName.value.trim().toLowerCase();
-    if(!q){ suggestions.classList.add('hidden'); return; }
-    const matches = Object.values(products).filter(p=> (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q)).slice(0,20);
-    if(!matches.length){ suggestions.classList.add('hidden'); return; }
-    suggestions.innerHTML = '';
-    matches.forEach(m=>{
-      const d = document.createElement('div'); d.className='product-item'; d.textContent = m.name + (m.rate?` — ₹${m.rate}`:'');
-      d.addEventListener('click', ()=>{
-        itemName.value = m.name || '';
-        itemMrp.value = m.mrp || '';
-        itemRate.value = m.rate || '';
-        itemDisc.value = m.discount || '';
-        itemQty.value = 1;
-        suggestions.classList.add('hidden');
-      });
-      suggestions.appendChild(d);
-    });
-    suggestions.classList.remove('hidden');
-  }
-
-  // render items
   function renderItems(){
-    itemsTableBody.innerHTML = '';
+    itemsTbody.innerHTML = '';
     items.forEach((it, idx)=>{
       const tr = document.createElement('tr');
-      if(it.qty <= parseInt(lowThreshold.value||100)) tr.classList.add('low');
+      if(it.qty <= (parseInt(lowThresholdEl.value||100))) tr.classList.add('low');
       tr.innerHTML = `<td>${escapeHtml(it.name)}</td>
-        <td>₹ ${number(it.mrp)}</td><td>₹ ${number(it.rate)}</td><td>${number(it.discount)}%</td>
-        <td>${it.qty}</td><td>₹ ${number(it.total)}</td>
-        <td><button class="small" data-i="${idx}">Del</button></td>`;
-      tr.querySelector('button').addEventListener('click', (e)=>{ items.splice(idx,1); pushSnapshot(); renderItems(); saveApp(); });
-      itemsTableBody.appendChild(tr);
+        <td>₹ ${num(it.mrp)}</td>
+        <td>₹ ${num(it.rate)}</td>
+        <td>${num(it.discount)}%</td>
+        <td>${it.qty}</td>
+        <td>₹ ${num(it.total)}</td>
+        <td class="actions-cell">
+          <button class="small" data-i="${idx}" data-action="edit">Edit</button>
+          <button class="small" data-i="${idx}" data-action="dup">Dup</button>
+          <button class="small" data-i="${idx}" data-action="del">Del</button>
+        </td>`;
+      itemsTbody.appendChild(tr);
+    });
+    // attach action listeners
+    itemsTbody.querySelectorAll('button').forEach(btn=>{
+      const i = parseInt(btn.dataset.i,10);
+      const a = btn.dataset.action;
+      btn.addEventListener('click', ()=> {
+        if(a==='del'){ items.splice(i,1); pushSnapshot(); renderItems(); saveSettingsToStorage(); }
+        if(a==='dup'){ items.splice(i+1,0, JSON.parse(JSON.stringify(items[i]))); pushSnapshot(); renderItems(); }
+        if(a==='edit'){ editItemDialog(i); }
+      });
     });
     updateTotals();
   }
 
-  // totals
+  function editItemDialog(idx){
+    const it = items[idx];
+    const name = prompt("Item name:", it.name);
+    if(name===null) return;
+    const mrp = parseFloat(prompt("MRP:", it.mrp) || it.mrp);
+    const rate = parseFloat(prompt("Rate:", it.rate) || it.rate);
+    const disc = parseFloat(prompt("Discount%:", it.discount) || it.discount);
+    const qty = parseInt(prompt("Qty:", it.qty) || it.qty);
+    items[idx] = { name, mrp, rate, discount: disc, qty, total: +(rate * qty * (1 - disc/100)).toFixed(2) };
+    pushSnapshot();
+    renderItems();
+  }
+
+  // Totals
   function updateTotals(){
-    const sub = items.reduce((s,i)=>s + (i.total||0), 0);
-    const gstPct = parseFloat(gstEl.value||0);
-    const gstAmt = +(sub * gstPct/100).toFixed(2);
+    const sub = items.reduce((s,i)=> s + (i.total||0), 0);
+    const gstPct = parseFloat(gstPercentEl.value||0) || 0;
+    const gstAmt = +(sub * gstPct / 100).toFixed(2);
     const total = +(sub + gstAmt).toFixed(2);
-    subtotalEl.textContent = number(sub);
-    gstAmtEl.textContent = number(gstAmt);
-    totalEl.textContent = number(total);
-    itemCountEl.textContent = items.length;
-    const paid = parseFloat(paidEl.value||0) || 0;
-    dueEl.textContent = number( Math.max(0, total - paid) );
+    subTotalEl.textContent = num(sub);
+    gstAmountEl.textContent = num(gstAmt);
+    totalAmountEl.textContent = num(total);
+    const paid = parseFloat(paidAmountEl.value||0) || 0;
+    dueAmountEl.textContent = num(Math.max(0, total - paid));
+    itemsCountEl.textContent = items.length;
   }
 
-  paidEl.addEventListener('input', updateTotals);
-  gstEl.addEventListener('input', ()=>{ updateTotals(); saveApp(); });
-
-  // remove low stock
-  removeLowBtn.addEventListener('click', ()=>{
-    const thr = parseInt(lowThreshold.value||0);
-    items = items.filter(i=> i.qty > thr);
-    pushSnapshot(); renderItems(); saveApp();
-  });
-
-  // clear all
-  function clearAll(){
-    if(!confirm("Clear the current invoice?")) return;
-    items = [];
-    pushSnapshot(); renderItems(); saveApp();
-    document.getElementById('custName').value = "Customer";
-    document.getElementById('custPhone').value = "";
-  }
-  clearBtn.addEventListener('click', clearAll);
-
-  // print preview
-  function formatLine(item){
-    const n = item.name.substring(0,24).padEnd(24,' ');
-    const mrp = number(item.mrp).padStart(8,' ');
-    const rate = number(item.rate).padStart(8,' ');
-    const disc = (''+number(item.discount)).padStart(6,' ');
-    const qty = (''+item.qty).padStart(4,' ');
-    const tot = number(item.total).padStart(10,' ');
-    return `${n}${mrp}${rate}${disc}${qty}${tot}`;
-  }
+  // ---------- PRINT / PDF ----------
   function refreshPrintPreview(){
-    const billNo = 'BILL-' + Math.floor(Math.random()*900000+100000);
+    const billNo = getNextBillNo(); // get and increment - we'll rollback if not saving to DB
     const lines = [];
-    lines.push(defaultShop.name);
-    lines.push(defaultShop.address);
-    lines.push(defaultShop.phone);
+    lines.push(document.getElementById('shopName').textContent);
+    lines.push(document.getElementById('shopMeta').textContent);
     lines.push('-'.repeat(60));
     lines.push(`Bill No: ${billNo}   Date: ${new Date().toLocaleString()}`);
     lines.push('-'.repeat(60));
-    lines.push('Item                     MRP    Rate  Disc%  Qty     Total');
+    lines.push(`Item                     MRP    Rate  Disc%  Qty     Total`);
     lines.push('-'.repeat(60));
-    items.forEach(i=>lines.push(formatLine(i)));
+    items.forEach(i => {
+      const n = (i.name || '').substring(0,24).padEnd(24,' ');
+      const mrp = num(i.mrp).padStart(6,' ');
+      const rate = num(i.rate).padStart(7,' ');
+      const disc = String(num(i.discount)).padStart(6,' ');
+      const qty = String(i.qty).padStart(4,' ');
+      const tot = num(i.total).padStart(11,' ');
+      lines.push(`${n}${mrp}${rate}${disc}${qty}${tot}`);
+    });
     lines.push('-'.repeat(60));
-    lines.push(`SubTotal: ₹ ${subtotalEl.textContent}`);
-    lines.push(`GST: ₹ ${gstAmtEl.textContent}`);
-    lines.push(`Total: ₹ ${totalEl.textContent}`);
-    lines.push(`Paid: ₹ ${paidEl.value || 0}  Due: ₹ ${dueEl.textContent}`);
+    lines.push(`SubTotal: ₹ ${subTotalEl.textContent}`);
+    lines.push(`GST: ₹ ${gstAmountEl.textContent}`);
+    lines.push(`Total: ₹ ${totalAmountEl.textContent}`);
+    lines.push(`Paid: ₹ ${paidAmountEl.value || 0}  Due: ₹ ${dueAmountEl.textContent}`);
     lines.push('-'.repeat(60));
-    printPreview.textContent = lines.join("\n");
+    printPreviewEl.textContent = lines.join("\n");
+    // we incremented counter prematurely: reduce by 1 back so savePdf will get next fresh number
+    let current = parseInt(localStorage.getItem(COUNTER_KEY)||"0",10); localStorage.setItem(COUNTER_KEY,String(Math.max(0,current-1)));
   }
-  printBtn.addEventListener('click', ()=>{
-    window.print();
-  });
-  savePdfBtn.addEventListener('click', savePDF);
-  savePdfBtn2.addEventListener('click', savePDF);
-  openPrintTabBtn.addEventListener('click', ()=> {
-    document.querySelector('.tab[data-tab="print"]').click();
-  });
 
-  function savePDF(){
+  function savePdf(){
     refreshPrintPreview();
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({unit:'pt', format:'a4'});
-    const lines = printPreview.textContent.split('\n');
-    const left = 40, top = 40, lineh = 12;
-    let y = top;
-    doc.setFont('Courier', 'normal');
-    lines.forEach((l, idx)=>{
-      doc.text(String(l), left, y);
-      y += lineh;
-      if(y > doc.internal.pageSize.getHeight() - 60){
-        doc.addPage(); y = top;
-      }
-    });
-    const filename = `bill_${Date.now()}.pdf`;
-    doc.save(filename);
-    alert('PDF saved: ' + filename);
+    // use jsPDF
+    try{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit:'pt', format:'a4'});
+      const lines = printPreviewEl.textContent.split('\n');
+      const left = 40, top = 40, lineh = 12;
+      let y = top;
+      doc.setFont("Courier");
+      doc.setFontSize(10);
+      lines.forEach((line, idx)=>{
+        doc.text(String(line), left, y);
+        y += lineh;
+        if(y > doc.internal.pageSize.getHeight() - 60){
+          doc.addPage(); y = top;
+        }
+      });
+      const filename = `bill_${Date.now()}.pdf`;
+      doc.save(filename);
+      alert('PDF saved: ' + filename);
+      // persist bill to bills list
+      saveBillToHistory();
+    }catch(err){
+      alert('PDF save failed: ' + err);
+    }
   }
 
-  // products management
-  function renderProductsTree(filter){
-    prodTree.innerHTML = '';
-    const arr = Object.values(products).sort((a,b)=> (a.name||'').localeCompare(b.name||''));
-    const q = (filter || '').trim().toLowerCase();
-    arr.filter(p=>{
-      if(!q) return true;
-      return (p.name||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q);
-    }).forEach(p=>{
-      const div = document.createElement('div');
-      div.className = 'product-item'; div.style.padding='8px'; div.style.borderBottom='1px solid #eee';
-      div.innerHTML = `<strong>${escapeHtml(p.name||'')}</strong><div style="font-size:12px;color:#666">Rate: ₹${number(p.rate)} • Qty: ${p.qty||0}</div>`;
-      div.addEventListener('click', ()=> loadProductToForm(p.name));
-      prodTree.appendChild(div);
-    });
+  function saveBillToHistory(){
+    try{
+      const b = JSON.parse(localStorage.getItem(BILLS_KEY) || '[]');
+      const billNo = getNextBillNo();
+      const now = new Date().toISOString();
+      const gstAmt = parseFloat(gstAmountEl.textContent||0);
+      const total = parseFloat(totalAmountEl.textContent||0);
+      const paid = parseFloat(paidAmountEl.value||0) || 0;
+      const due = Math.max(0, total - paid);
+      const bill = {
+        bill_no: billNo, date: now, customer: document.getElementById('custName').value||'Customer',
+        phone: document.getElementById('custPhone').value||'', subtotal: parseFloat(subTotalEl.textContent||0),
+        gst: gstAmt, total, paid, due, items: items.slice()
+      };
+      b.push(bill);
+      saveBillsToStorage(b);
+    }catch(e){ console.error(e) }
   }
 
-  function loadProductToForm(name){
-    const p = products[name.toLowerCase()] || {};
+  // ---------- PRODUCTS ----------
+  function renderProducts(filter){
+    const f = (filter||'').trim().toLowerCase();
+    prodListEl.innerHTML = '';
+    Object.values(products).sort((a,b)=> (a.name||'').localeCompare(b.name||'')).forEach(p=>{
+      if(f && !((p.name||'').toLowerCase().includes(f) || (p.brand||'').toLowerCase().includes(f) || (p.category||'').toLowerCase().includes(f))) return;
+      const d = document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid #f2f2f2';
+      d.style.cursor = 'pointer';
+      d.innerHTML = `<strong>${escapeHtml(p.name)}</strong><div style="font-size:13px;color:${getCssVar('--muted')}">Rate: ₹${num(p.rate)} • Qty: ${p.qty||0}</div>`;
+      d.addEventListener('click', ()=> loadProductToForm(p));
+      prodListEl.appendChild(d);
+    });
+  }
+  function loadProductToForm(p){
     p_sku.value = p.sku || '';
     p_name.value = p.name || '';
     p_category.value = p.category || '';
@@ -576,61 +748,62 @@
     p_discount.value = p.discount || '';
     p_qty.value = p.qty || '';
     p_image_preview.innerHTML = '';
-    if(p.imageData){
-      const img = new Image(); img.src = p.imageData; img.style.maxWidth='160px'; img.style.maxHeight='120px';
-      p_image_preview.appendChild(img);
-    }
+    if(p.imageData){ const img = document.createElement('img'); img.src = p.imageData; img.style.maxWidth='100%'; img.style.maxHeight='160px'; p_image_preview.appendChild(img); }
   }
 
-  saveProdBtn.addEventListener('click', ()=>{
+  function saveProductFromForm(){
     const name = (p_name.value||'').trim();
     if(!name){ alert('Product name required'); return; }
     const p = {
-      sku: p_sku.value || '',
+      sku: p_sku.value||'',
       name,
-      category: p_category.value || '',
-      brand: p_brand.value || '',
+      category: p_category.value||'',
+      brand: p_brand.value||'',
       mrp: parseFloat(p_mrp.value||0) || 0,
       rate: parseFloat(p_rate.value||0) || 0,
       discount: parseFloat(p_discount.value||0) || 0,
       qty: parseInt(p_qty.value||0) || 0
     };
-    if(p_imagefile.files && p_imagefile.files[0]){
+    // image
+    const file = p_image.files && p_image.files[0];
+    if(file){
       const fr = new FileReader();
-      fr.onload = ()=>{ p.imageData = fr.result; products[name.toLowerCase()] = p; saveProducts(); renderProductsTree(prodSearch.value); pushSnapshot(); alert('Saved'); };
-      fr.readAsDataURL(p_imagefile.files[0]);
+      fr.onload = ()=> { p.imageData = fr.result; products[name.toLowerCase()] = p; saveProductsToStorage(); renderProducts(); pushSnapshot(); alert('Saved'); }
+      fr.readAsDataURL(file);
     } else {
-      // preserve existing image if present
-      const existing = products[name.toLowerCase()] || {};
-      if(existing.imageData) p.imageData = existing.imageData;
+      // preserve previous image if exists
+      const prev = products[name.toLowerCase()] || {};
+      if(prev.imageData) p.imageData = prev.imageData;
       products[name.toLowerCase()] = p;
-      saveProducts(); renderProductsTree(prodSearch.value); pushSnapshot(); alert('Saved');
+      saveProductsToStorage();
+      renderProducts();
+      pushSnapshot();
+      alert('Saved');
     }
-  });
-  deleteProdBtn.addEventListener('click', ()=>{
-    const name = (p_name.value||'').trim();
-    if(!name) return alert('Select product to delete');
-    if(!confirm('Delete product '+name+' ?')) return;
-    delete products[name.toLowerCase()];
-    saveProducts(); renderProductsTree(prodSearch.value); alert('Deleted');
-  });
-  addProdBtn.addEventListener('click', ()=> {
-    p_sku.value=''; p_name.value=''; p_category.value=''; p_brand.value=''; p_mrp.value=''; p_rate.value=''; p_discount.value=''; p_qty.value='';
-    p_image_preview.innerHTML=''; p_imagefile.value='';
-  });
+  }
 
-  prodSearch.addEventListener('input', ()=> renderProductsTree(prodSearch.value));
+  function deleteProductFromForm(){
+    const name = (p_name.value||'').trim(); if(!name) return alert('Choose product to delete');
+    if(!confirm('Delete product "'+name+'" ?')) return;
+    delete products[name.toLowerCase()];
+    saveProductsToStorage();
+    renderProducts();
+    pushSnapshot();
+    alert('Deleted');
+  }
 
   // CSV import/export (products)
-  importCsvBtn.addEventListener('click', ()=> {
-    const f = document.createElement('input'); f.type='file'; f.accept='text/csv';
-    f.onchange = e=>{
+  function importProductsCsv(){
+    const f = document.createElement('input'); f.type='file'; f.accept='.csv';
+    f.onchange = (e)=> {
       const file = e.target.files[0]; if(!file) return;
-      const fr = new FileReader(); fr.onload = ()=> {
+      const fr = new FileReader();
+      fr.onload = ()=> {
         const txt = fr.result;
         const rows = csvToArray(txt);
         rows.forEach(r=>{
-          const name = r.name || r.Name || r.product || r.Product; if(!name) return;
+          const name = r.name || r.Name || r.product || r.Product;
+          if(!name) return;
           products[name.toLowerCase()] = {
             sku: r.sku||'',
             name,
@@ -642,115 +815,176 @@
             qty: parseInt(r.qty||0)||0
           };
         });
-        saveProducts(); renderProductsTree(); pushSnapshot(); alert('Imported CSV');
+        saveProductsToStorage(); renderProducts(); pushSnapshot(); alert('Imported CSV');
       }; fr.readAsText(file,'utf8');
     }; f.click();
-  });
-
-  exportCsvBtn.addEventListener('click', ()=>{
-    const rows = Object.values(products).map(p=> ({name:p.name, sku:p.sku, category:p.category, brand:p.brand, mrp:p.mrp, rate:p.rate, discount:p.discount, qty:p.qty}) );
-    const csv = arrayToCsv(rows);
+  }
+  function exportProductsCsv(){
+    const arr = Object.values(products).map(p=> ({name:p.name, sku:p.sku, category:p.category, brand:p.brand, mrp:p.mrp, rate:p.rate, discount:p.discount, qty:p.qty}) );
+    const csv = arrayToCsv(arr);
     downloadText(csv, 'products_export.csv', 'text/csv');
-  });
+  }
 
-  // Backup / restore app JSON
-  downloadJsonBtn.addEventListener('click', ()=>{
-    const data = { products, items, settings:{gst:gstEl.value, lowThreshold:lowThreshold.value} };
-    downloadText(JSON.stringify(data, null,2), 'billing_app_export.json', 'application/json');
-  });
-  uploadJsonBtn.addEventListener('click', ()=> uploadJsonInput.click());
-  uploadJsonInput.addEventListener('change', (e)=>{
-    const f = e.target.files[0]; if(!f) return;
-    const fr = new FileReader(); fr.onload = ()=> {
-      try{
-        const data = JSON.parse(fr.result);
-        if(data.products) products = data.products;
-        if(data.items) items = data.items;
-        saveProducts(); saveApp(); renderProductsTree(); renderItems(); pushSnapshot(); alert('Imported JSON');
-      }catch(err){ alert('Invalid JSON'); }
-    }; fr.readAsText(f,'utf8');
-  });
-
-  // Import/Export app JSON buttons in header
-  backupBtn.addEventListener('click', ()=> downloadJsonBtn.click());
-  importBtn.addEventListener('click', ()=> uploadJsonBtn.click());
-
-  // Export products JSON quick
-  document.getElementById('saveProductsJson').addEventListener('click', ()=> {
-    downloadText(JSON.stringify(products,null,2),'products.json','application/json');
-  });
-  document.getElementById('loadProductsJson').addEventListener('click', ()=> {
+  // products JSON import
+  function importProductsJson(){
     const f = document.createElement('input'); f.type='file'; f.accept='application/json';
     f.onchange = e=>{
       const file = e.target.files[0]; if(!file) return;
-      const fr = new FileReader(); fr.onload = ()=> {
-        try{ products = JSON.parse(fr.result); saveProducts(); renderProductsTree(); pushSnapshot(); alert('Loaded products'); }catch(e){ alert('Bad file'); }
+      const fr = new FileReader(); fr.onload = ()=>{
+        try{ const data = JSON.parse(fr.result); if(data.products){ products = data.products; saveProductsToStorage(); renderProducts(); pushSnapshot(); alert('Imported products JSON'); } }catch(err){ alert('Invalid JSON'); }
       }; fr.readAsText(file,'utf8');
     }; f.click();
-  });
-
-  // Help
-  helpBtn.addEventListener('click', ()=> alert("Shortcuts:\nCtrl+S Save PDF\nCtrl+N New Invoice\nAlt+T Cycle Theme\nFamiliar functions are on-screen."));
-
-  // Utility helpers
-  function number(v){ return (parseFloat(v)||0).toFixed(2); }
-  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function downloadText(text, filename, mime){
-    const blob = new Blob([text], {type: mime||'text/plain'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-    setTimeout(()=>URL.revokeObjectURL(url), 2000);
-  }
-  function csvToArray(csv){
-    // simple CSV parser to array of objects (first row = headers)
-    const lines = csv.replace(/\r/g,'').split('\n').filter(Boolean);
-    if(!lines.length) return [];
-    const headers = lines[0].split(',').map(h=>h.trim());
-    return lines.slice(1).map(l=>{
-      const cols = l.split(',');
-      const obj = {};
-      headers.forEach((h,i)=> obj[h]=cols[i]!==undefined?cols[i].trim():'');
-      return obj;
-    });
-  }
-  function arrayToCsv(arr){
-    if(!arr.length) return '';
-    const keys = Object.keys(arr[0]);
-    const lines = [keys.join(',')];
-    arr.forEach(r=> lines.push(keys.map(k=> (''+ (r[k]===undefined?'':r[k])).replace(/"/g,'""')).map(v=>`"${v}"`).join(',')));
-    return lines.join('\n');
   }
 
-  // init
-  (function init(){
-    // load stored app
-    const app = loadApp();
-    if(app && app.items){ items = app.items || []; if(app.settings && app.settings.gst) gstEl.value = app.settings.gst; if(app.settings && app.settings.lowThreshold) lowThreshold.value = app.settings.lowThreshold; }
-    renderProductsTree();
-    renderItems();
-    pushSnapshot(); // initial snapshot
+  // ---------- Undo / Redo ----------
+  function pushSnapshot(){
+    undoStack = undoStack.slice(0, undoIndex+1);
+    undoStack.push(JSON.stringify({ products, items }));
+    if(undoStack.length > 200) undoStack.shift();
+    undoIndex = undoStack.length - 1;
     updateUndoButtons();
-  })();
+  }
+  function doUndo(){
+    if(undoIndex <= 0) return;
+    undoIndex -= 1;
+    const state = JSON.parse(undoStack[undoIndex]);
+    products = state.products || {};
+    items = state.items || [];
+    saveProductsToStorage(); renderProducts(); renderItems();
+    updateUndoButtons();
+  }
+  function doRedo(){
+    if(undoIndex >= undoStack.length - 1) return;
+    undoIndex += 1;
+    const state = JSON.parse(undoStack[undoIndex]);
+    products = state.products || {};
+    items = state.items || [];
+    saveProductsToStorage(); renderProducts(); renderItems();
+    updateUndoButtons();
+  }
+  function updateUndoButtons(){ undoBtn.disabled = undoIndex <= 0; redoBtn.disabled = undoIndex >= undoStack.length - 1; }
 
-  // small utilities
-  function renderProductsTreeDelayed(){ setTimeout(()=>renderProductsTree(prodSearch.value),0); }
-  document.getElementById('reloadProducts').addEventListener('click', ()=> { products = loadProducts(); renderProductsTree(); alert('Products reloaded'); });
-  document.getElementById('prodSearch').addEventListener('keyup', renderProductsTreeDelayed);
+  // ---------- Utilities ----------
+  function num(v){ return (parseFloat(v)||0).toFixed(2); }
+  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function downloadText(text, filename, mime){ const blob = new Blob([text], {type: mime||'text/plain'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); }
+  function csvToArray(csv){ const lines = csv.replace(/\r/g,'').split('\n').filter(Boolean); if(!lines.length) return []; const headers = lines[0].split(',').map(h=>h.trim()); return lines.slice(1).map(l=>{ const cols = l.split(','); const o = {}; headers.forEach((h,i)=> o[h]=cols[i]!==undefined?cols[i].trim():'' ); return o; }); }
+  function arrayToCsv(arr){ if(!arr.length) return ''; const keys = Object.keys(arr[0]); const lines = [keys.join(',')]; arr.forEach(r=> lines.push(keys.map(k=>('"'+String(r[k]||'').replace(/"/g,'""')+'"')).join(','))); return lines.join('\n'); }
+  function getCssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name) || '#666'; }
 
-  // misc buttons
-  document.getElementById('openPrintTab').addEventListener('click', ()=> { document.querySelector('.tab[data-tab="print"]').click(); });
-  document.getElementById('backToBilling').addEventListener('click', ()=> { document.querySelector('.tab[data-tab="billing"]').click(); });
+  // ---------- Theme ----------
+  const themeOrder = ['','theme-dark','theme-warm'];
+  let themeIndex = 0;
+  function applyTheme(name){
+    document.body.classList.remove(...themeOrder);
+    if(name==='Dark') document.body.classList.add('theme-dark');
+    if(name==='Warm') document.body.classList.add('theme-warm');
+    settings.lastTheme = name;
+    saveSettingsToStorage();
+  }
+  function cycleTheme(){
+    themeIndex = (themeIndex+1) % themeOrder.length;
+    const name = themeOrder[themeIndex] === '' ? 'Light' : (themeOrder[themeIndex] === 'theme-dark' ? 'Dark' : 'Warm');
+    applyTheme(name);
+    alert('Theme: ' + name);
+  }
 
-  // helper: escape on inputs to prevent accidental script insertion when showing text
-  function safeValue(v){ return v===null||v===undefined? '': String(v); }
+  // ---------- Shortcuts/help ----------
+  function showShortcuts(){
+    alert([
+      "Keyboard & UI shortcuts:",
+      "Ctrl+S — Save PDF",
+      "Ctrl+N — New invoice (clear)",
+      "Alt+T — Cycle theme",
+      "Enter — Add item (in Qty field)",
+      "Use Import/Export to backup data"
+    ].join('\\n'));
+  }
 
-  // expose some functions for console debugging
-  window._billingApp = {
-    products, items, saveProducts, saveApp, renderItems, renderProductsTree
-  };
+  // ---------- Clear invoice ----------
+  function clearAll(){
+    if(!confirm('Clear current invoice?')) return;
+    items = [];
+    pushSnapshot();
+    renderItems();
+    document.getElementById('custName').value = 'Customer';
+    document.getElementById('custPhone').value = '';
+  }
+
+  // ---------- Save bill history (already in savePdf) ----------
+  // (already implemented in savePdf -> saveBillToHistory)
+
+  // ---------- Helpers for product JSON import ----------
+  function importProductsJsonPrompt(){
+    const f = document.createElement('input'); f.type='file'; f.accept='application/json';
+    f.onchange = e=> {
+      const file = e.target.files[0]; if(!file) return;
+      const fr = new FileReader(); fr.onload = ()=> {
+        try{ const data = JSON.parse(fr.result); if(data.products){ products = data.products; saveProductsToStorage(); renderProducts(); pushSnapshot(); alert('Imported products JSON'); } }catch(err){ alert('Invalid JSON'); }
+      }; fr.readAsText(file,'utf8');
+    }; f.click();
+  }
+
+  // ---------- Save app JSON helper ----------
+  function downloadAppJson(){
+    const payload = { products, items, settings };
+    downloadText(JSON.stringify(payload,null,2), 'billing_app_export.json', 'application/json');
+  }
+
+  // ---------- CSV/JSON import for app ----------
+  function importProductsJson(){ importProductsJson(); }
+
+  // ---------- Misc small helpers ----------
+  function getNextBillNoPeek(){
+    let n = parseInt(localStorage.getItem(COUNTER_KEY) || "0", 10);
+    return `BILL-${String(n+1).padStart(6,'0')}`;
+  }
+
+  // ---------- Initialization helpers ----------
+  function renderProductsThrottled(){ setTimeout(()=> renderProducts(prodSearchEl.value), 0); }
+
+  // ---------- init call ----------
+  init();
+
+  // expose some for console
+  window.billingApp = { products, items, saveProductsToStorage, renderProducts, renderItems };
+
+  // small functions defined after init for clarity
+  function pushSnapshot(){ // re-defined to ensure proper closure (we used earlier, but ensure it's available)
+    undoStack = undoStack.slice(0, undoIndex+1);
+    undoStack.push(JSON.stringify({ products, items }));
+    if(undoStack.length > 200) undoStack.shift();
+    undoIndex = undoStack.length - 1;
+    updateUndoButtons();
+  }
+  function doUndo(){ if(undoIndex <= 0) return; undoIndex -= 1; const state = JSON.parse(undoStack[undoIndex] || '{}'); products = state.products || {}; items = state.items || []; saveProductsToStorage(); renderProducts(); renderItems(); updateUndoButtons(); }
+  function doRedo(){ if(undoIndex >= undoStack.length - 1) return; undoIndex += 1; const state = JSON.parse(undoStack[undoIndex] || '{}'); products = state.products || {}; items = state.items || []; saveProductsToStorage(); renderProducts(); renderItems(); updateUndoButtons(); }
+  function updateUndoButtons(){ undoBtn.disabled = undoIndex <= 0; redoBtn.disabled = undoIndex >= undoStack.length - 1; }
+
+  // ensure renderItems is reachable
+  function renderItems(){ itemsTbody.innerHTML = ''; items.forEach((it, idx)=> {
+    const tr = document.createElement('tr'); if(it.qty <= (parseInt(lowThresholdEl.value||100))) tr.classList.add('low');
+    tr.innerHTML = `<td>${escapeHtml(it.name)}</td><td>₹ ${num(it.mrp)}</td><td>₹ ${num(it.rate)}</td><td>${num(it.discount)}%</td><td>${it.qty}</td><td>₹ ${num(it.total)}</td><td class="actions-cell"><button class="small" data-i="${idx}" data-action="edit">Edit</button> <button class="small" data-i="${idx}" data-action="dup">Dup</button> <button class="small" data-i="${idx}" data-action="del">Del</button></td>`;
+    itemsTbody.appendChild(tr);
+  });
+  itemsTbody.querySelectorAll('button').forEach(btn=> {
+    const i = parseInt(btn.dataset.i,10), a = btn.dataset.action;
+    btn.addEventListener('click', ()=> {
+      if(a==='del'){ items.splice(i,1); pushSnapshot(); renderItems(); saveSettingsToStorage(); }
+      if(a==='dup'){ items.splice(i+1,0, JSON.parse(JSON.stringify(items[i]))); pushSnapshot(); renderItems(); }
+      if(a==='edit'){ const it = items[i]; const name=prompt('Name',it.name); if(name===null) return; const mrp=parseFloat(prompt('MRP',it.mrp)||it.mrp); const rate=parseFloat(prompt('Rate',it.rate)||it.rate); const disc=parseFloat(prompt('Disc',it.discount)||it.discount); const qty=parseInt(prompt('Qty',it.qty)||it.qty); items[i] = {name, mrp, rate, discount:disc, qty, total: +(rate*qty*(1-disc/100)).toFixed(2)}; pushSnapshot(); renderItems(); }
+    });
+  });
+  updateTotals();
+  }
+
+  function savePdf(){ refreshPrintPreview(); try{ const { jsPDF } = window.jspdf; const doc = new jsPDF({unit:'pt', format:'a4'}); const lines = printPreviewEl.textContent.split('\n'); const left=40, top=40, lineh=12; let y=top; doc.setFont('Courier'); doc.setFontSize(10); lines.forEach((l)=>{ doc.text(String(l), left, y); y += lineh; if(y > doc.internal.pageSize.getHeight()-60){ doc.addPage(); y=top; } }); const filename = 'bill_'+Date.now()+'.pdf'; doc.save(filename); saveBillToHistory(); alert('Saved PDF: '+filename); }catch(e){ alert('Failed to save PDF: '+e); } }
+
+  function refreshPrintPreview(){ const billNo = getNextBillNoPeek(); const lines = []; lines.push(document.getElementById('shopName').textContent); lines.push(document.getElementById('shopMeta').textContent); lines.push('='.repeat(60)); lines.push(`Bill No: ${billNo}   Date: ${new Date().toLocaleString()}`); lines.push('='.repeat(60)); lines.push(`Item                     MRP    Rate  Disc%  Qty     Total`); lines.push('-'.repeat(60)); items.forEach(i=>{ const n = (i.name||'').substring(0,24).padEnd(24,' '); const mrp = num(i.mrp).padStart(6,' '); const rate = num(i.rate).padStart(7,' '); const disc = String(num(i.discount)).padStart(6,' '); const qty = String(i.qty).padStart(4,' '); const tot = num(i.total).padStart(11,' '); lines.push(`${n}${mrp}${rate}${disc}${qty}${tot}`); }); lines.push('-'.repeat(60)); lines.push(`SubTotal: ₹ ${subTotalEl.textContent}`); lines.push(`GST: ₹ ${gstAmountEl.textContent}`); lines.push(`Total: ₹ ${totalAmountEl.textContent}`); lines.push(`Paid: ₹ ${paidAmountEl.value||0}  Due: ₹ ${dueAmountEl.textContent}`); lines.push('='.repeat(60)); printPreviewEl.textContent = lines.join('\\n'); }
+
+  function saveBillToHistory(){ try{ const bills = JSON.parse(localStorage.getItem(BILLS_KEY)||'[]'); const billNo = getNextBillNo(); const now = new Date().toISOString(); const gstAmt = parseFloat(gstAmountEl.textContent||0); const total = parseFloat(totalAmountEl.textContent||0); const paid = parseFloat(paidAmountEl.value||0)||0; const due = Math.max(0, total - paid); const bill = { bill_no: billNo, date: now, customer: document.getElementById('custName').value||'Customer', phone: document.getElementById('custPhone').value||'', subtotal: parseFloat(subTotalEl.textContent||0), gst: gstAmt, total, paid, due, items: items.slice() }; bills.push(bill); localStorage.setItem(BILLS_KEY, JSON.stringify(bills)); }catch(e){ console.error(e); } }
 
 })();
 </script>
-
 </body>
 </html>
