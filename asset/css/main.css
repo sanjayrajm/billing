@@ -1,0 +1,254 @@
+/* ========== ROOT COLORS ========= */
+:root {
+  --bg:#f7f9fc;
+  --panel:#eaf0fb;
+  --accent:#1976d2;
+  --text:#1f2937;
+  --low:#ffefef;
+  --font-family:"Segoe UI", Arial, sans-serif;
+  --mono:"Consolas", monospace;
+}
+
+/* Dark theme */
+body.theme-dark {
+  --bg:#0f1724;
+  --panel:#0b1220;
+  --accent:#1e88e5;
+  --text:#e6eef8;
+  --low:#3b0f0f;
+}
+
+/* Warm theme */
+body.theme-warm {
+  --bg:#fcfbf8;
+  --panel:#f6efe6;
+  --accent:#ef6c00;
+  --text:#3b2f2f;
+  --low:#ffddd2;
+}
+
+/* ========== BASE ========== */
+body {
+  margin:0;
+  background:var(--bg);
+  font-family:var(--font-family);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* Header */
+header {
+  padding:12px;
+  background:var(--panel);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+header h1 {
+  flex:1;
+  font-size:18px;
+  margin:0;
+}
+
+/* General containers */
+main {
+  flex:1;
+  display:flex;
+  gap:12px;
+  padding:12px;
+  box-sizing:border-box;
+}
+.left, .right {
+  background:var(--panel);
+  padding:12px;
+  border-radius:8px;
+}
+
+/* Desktop width */
+.left { width:60%; min-width:450px; }
+.right { width:40%; min-width:300px; }
+
+/* Inputs */
+input, select {
+  width:100%;
+  padding:9px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:15px;
+  box-sizing:border-box;
+}
+
+/* Buttons */
+.btn {
+  padding:10px 14px;
+  border-radius:6px;
+  color:white;
+  background:var(--accent);
+  border:none;
+  cursor:pointer;
+  font-size:15px;
+}
+.btn.small { padding:6px 10px; font-size:14px; }
+.btn.secondary {
+  background:#6b7280;
+}
+
+/* Tables */
+table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+th, td {
+  padding:8px;
+  border-bottom:1px solid #ddd;
+}
+tr.low {
+  background:var(--low);
+}
+
+/* Horizontal scroll for mobile */
+.table-container {
+  overflow-x:auto;
+  width:100%;
+}
+
+/* Suggestions */
+.product-list {
+  max-height:200px;
+  overflow:auto;
+  background:white;
+  border:1px solid #ddd;
+  border-radius:6px;
+}
+
+/* Preview */
+.preview {
+  white-space:pre;
+  font-family:var(--mono);
+  background:white;
+  padding:10px;
+  border-radius:8px;
+  overflow:auto;
+}
+
+/* Tabs */
+.tabs {
+  display:flex;
+  gap:8px;
+}
+.tab {
+  padding:10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+.tab.active {
+  background:var(--accent);
+  color:white;
+}
+
+/* Footer */
+footer {
+  padding:10px;
+  font-size:14px;
+  text-align:center;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* ----- Tablets & Small Laptops ----- */
+@media (max-width:1100px) {
+  main {
+    flex-direction:column;
+  }
+  .left, .right {
+    width:100%;
+    min-width:0;
+  }
+}
+
+/* ----- Mobile Phones ----- */
+@media (max-width:768px) {
+
+  header {
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  header h1 {
+    font-size:16px;
+    width:100%;
+  }
+
+  main {
+    padding:8px;
+  }
+
+  .tabs {
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:var(--panel);
+    padding:6px 0;
+    justify-content:space-around;
+    border-top:2px solid #ccc;
+    z-index:1000;
+  }
+  .tab {
+    flex:1;
+    text-align:center;
+    padding:12px 0;
+    font-size:16px;
+  }
+
+  .left, .right {
+    padding-bottom:70px; /* space for bottom tabs */
+  }
+
+  input, select {
+    font-size:16px;
+    padding:12px;
+  }
+
+  .btn {
+    font-size:16px;
+    padding:12px;
+    width:100%;
+  }
+
+  .row {
+    flex-direction:column;
+  }
+
+  .table-container {
+    border:1px solid #ddd;
+    border-radius:6px;
+    background:white;
+    padding:0;
+  }
+
+  th, td {
+    padding:10px;
+    font-size:15px;
+  }
+
+}
+
+/* Very small screens */
+@media (max-width:480px) {
+
+  header h1 {
+    font-size:14px;
+  }
+
+  .btn {
+    font-size:15px;
+  }
+
+  table {
+    font-size:13px;
+  }
+}
