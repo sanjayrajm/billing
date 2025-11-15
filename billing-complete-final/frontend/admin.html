@@ -1,0 +1,21 @@
+<!-- frontend/admin.html -->
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin - Muthuganesan Textiles</title>
+<style>body{font-family:Arial;padding:12px}</style>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+  <p>This panel is for <strong>admin</strong> users only. It lists users and sales reports.</p>
+  <div id="users"></div>
+  <script>
+  async function loadUsers(){
+    const token = localStorage.getItem('billing_jwt');
+    if(!token){ document.getElementById('users').innerText='Not logged in'; return; }
+    const res = await fetch('/api/users', {headers:{'Authorization':'Bearer ' + token}});
+    if(res.ok){ const data = await res.json(); document.getElementById('users').innerText = JSON.stringify(data,null,2); }
+    else document.getElementById('users').innerText = 'Access denied';
+  }
+  loadUsers();
+  </script>
+</body></html>

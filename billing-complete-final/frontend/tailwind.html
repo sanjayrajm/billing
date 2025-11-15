@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Billing - Tailwind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <header class="bg-white shadow p-4 flex items-center justify-between">
+    <div>
+      <h1 class="text-lg font-bold">muthuganesan Textiles</h1>
+      <p class="text-sm text-gray-500">103 b kamachiamman sanathi street kanchipuram</p>
+    </div>
+    <div class="space-x-2">
+      <button id="login" class="bg-blue-600 text-white px-3 py-1 rounded">Login</button>
+      <button id="sync" class="bg-gray-200 px-3 py-1 rounded">Sync</button>
+    </div>
+  </header>
+  <main class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <section class="md:col-span-2 bg-white p-4 rounded shadow">
+      <h2 class="font-semibold mb-2">Billing</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <input class="border p-2 rounded" placeholder="Item name">
+        <input class="border p-2 rounded" placeholder="Rate">
+        <input class="border p-2 rounded" placeholder="Qty">
+      </div>
+      <div class="mt-4">
+        <button class="bg-green-600 text-white px-3 py-1 rounded">Add Item</button>
+      </div>
+    </section>
+    <aside class="bg-white p-4 rounded shadow">
+      <h3 class="font-semibold">Quick Tools</h3>
+      <div class="mt-2 space-y-2">
+        <button class="w-full bg-gray-100 p-2 rounded">Reload Products</button>
+        <button class="w-full bg-gray-100 p-2 rounded">Export</button>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

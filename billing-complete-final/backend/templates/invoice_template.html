@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Invoice</title>
+<style>
+  body{font-family:Arial, sans-serif;color:#222}
+  .header{display:flex;justify-content:space-between;align-items:center}
+  .items{width:100%;border-collapse:collapse}
+  .items th, .items td{border:1px solid #ddd;padding:8px}
+  .totals{margin-top:12px}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h2>Muthuganesan Textiles</h2>
+      <div>103 b kamachiamman sanathi street kanchipuram</div>
+    </div>
+    <div>
+      <strong>Invoice: {{bill_no}}</strong><br>
+      Date: {{date}}
+    </div>
+  </div>
+  <hr>
+  <div>Customer: {{customer}} • {{phone}}</div>
+  <table class="items">
+    <thead><tr><th>Item</th><th>MRP</th><th>Rate</th><th>Disc%</th><th>Qty</th><th>Total</th></tr></thead>
+    <tbody>
+    {{#items}}
+      <tr>
+        <td>{{name}}</td><td>{{mrp}}</td><td>{{rate}}</td><td>{{discount}}</td><td>{{qty}}</td><td>{{total}}</td>
+      </tr>
+    {{/items}}
+    </tbody>
+  </table>
+  <div class="totals">
+    SubTotal: ₹ {{subtotal}}<br>
+    GST: ₹ {{gst}}<br>
+    <strong>Total: ₹ {{total}}</strong>
+  </div>
+</body>
+</html>
